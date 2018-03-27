@@ -27,58 +27,35 @@ class QRCodeController: UIViewController {
 
     @IBOutlet weak var bn_generate: UIButton!
     
-    
-    /*
-    // MARK: - Navigation
 
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
     @IBAction func click(_ sender: Any) {
-        get_image(url_str : "https://chart.googleapis.com/chart?chs=50x50&cht=qr&chl=Hello+world&chld=L|1&choe=UTF-8", qrcode);
+        var n = txt_qrcode.text;
+        
+        if(n != nil){
+            n = n?.replacingOccurrences(of: " ", with: "+");
+            loadImage(imageURL: "https://chart.googleapis.com/chart?chs=320x320&cht=qr&chl="+n!+"");
+        }
+    
     }
     
     
-    func get_image(url_str:String, _ imageView:UIImageView)
+    func loadImage(imageURL : String)
     {
+        let myUrl = URL(string : imageURL);
+        let url = URLRequest(url : myUrl!);
+        let session  = URLSession.shared;
         
-        let url:URL = URL(string: url_str)!
-        let session = URLSession.shared
-        
-        let task = session.dataTask(with: url, completionHandler: {
-            (data, response, error) in
-            
-            
-            if data != nil
-            {
-                let image = UIImage(data: data!)
-                
-                if(image != nil)
-                {
-                    
-                    DispatchQueue.main.async(execute: {
-                        
-                        imageView.image = image
-                        imageView.alpha = 0
-                        
-                        UIView.animate(withDuration: 2.5, animations: {
-                            imageView.alpha = 1.0
-                        })
-                        
-                    })
-                    
+        let task = session.dataTask(with: url) {
+            (data, responde, error) in
+            if let imageData = data {
+                DispatchQueue.main.async {
+                    self.qrcode.image = UIImage(data : imageData);
                 }
-                
             }
-            
-            
-        })
+        }
         
-        task.resume()
+        task.resume();
     }
 
 }
